@@ -27,6 +27,15 @@ def loadImages():
 # The main driver for our code. This will handle user input and updating the graphics.
 def main():
     p.init()
+    p.display.set_caption("Chess") # Set the title of the window
+
+    # Set the icon of the window
+    try:
+        icon = p.image.load('images/chess.png')  # Replace 'icon.png' with your icon file path
+    except FileNotFoundError:
+        icon = p.image.load('Chess/images/chess.png')
+
+    p.display.set_icon(icon)
 
     screen = p.display.set_mode((WIDTH, HEIGHT))
     clock = p.time.Clock()
