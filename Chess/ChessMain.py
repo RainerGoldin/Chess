@@ -31,7 +31,7 @@ def main():
 
     # Set the icon of the window
     try:
-        icon = p.image.load('images/chess.png')  # Replace 'icon.png' with your icon file path
+        icon = p.image.load('images/chess.png')
     except FileNotFoundError:
         icon = p.image.load('Chess/images/chess.png')
 
@@ -69,17 +69,19 @@ def main():
                     sqSelected = (row, col)
                     playerClicks.append(sqSelected) # Append for both 1st and 2nd clicks
                 
-                if len(playerClicks) == 2: # After 2nd click
-                    move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
+                if len(playerClicks) == 2:  # After 2nd click
+                    if all(isinstance(click, tuple) and len(click) == 2 for click in playerClicks):
+                        move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
+                        
+                        if move in validMoves:  # Only print and execute valid moves
+                            print(move.getChessNotation())
+                            gs.makeMove(move)
+                            
+                            moveMade = True
 
-                    print(move.getChessNotation())
-                    
-                    if move in validMoves:
-                        gs.makeMove(move)
-                        moveMade = True
-                    
-                    sqSelected = () # Reset user clicks
+                    sqSelected = ()  # Reset user clicks
                     playerClicks = []
+
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z: # undo when 'z' is pressed
                     gs.undoMove()
