@@ -70,18 +70,18 @@ def main():
                     playerClicks.append(sqSelected) # Append for both 1st and 2nd clicks
                 
                 if len(playerClicks) == 2:  # After 2nd click
-                    if all(isinstance(click, tuple) and len(click) == 2 for click in playerClicks):
-                        move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
-                        
-                        if move in validMoves:  # Only print and execute valid moves
-                            print(move.getChessNotation())
-                            gs.makeMove(move)
-                            
+                    move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
+
+                    for i in range(len(validMoves)):                        
+                        if move == validMoves[i]:  # Only print and execute valid moves
+                            print(f'{move.pieceMoved} {move.getChessNotation()[:2]} => {move.getChessNotation()[2:]}')
+                            gs.makeMove(validMoves[i])
+
                             moveMade = True
-
-                    sqSelected = ()  # Reset user clicks
-                    playerClicks = []
-
+                            sqSelected = () # Reset user clicks
+                            playerClicks = []
+                    if not moveMade:
+                        playerClicks = [sqSelected]  # Keep the second click for correction
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z: # undo when 'z' is pressed
                     gs.undoMove()
