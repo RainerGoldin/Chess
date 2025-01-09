@@ -10,7 +10,7 @@ except ModuleNotFoundError:
 WIDTH = HEIGHT = 512 # 400 is also a good option
 DIMENSION = 8 # The dimension of a chess board is 8x8
 SQ_SIZE = HEIGHT // DIMENSION
-MAX_FPS = 15 # For the animations
+MAX_FPS = 60 # For the animations
 IMAGES = {}
 
 # Initialize a global dictionary if images. This will be called exactly once in the main.
@@ -108,7 +108,10 @@ def main():
 
         # Bot move finder
         if not gameOver and not humanTurn:
-            BotMove = SmartMoveFinder.findRandomMove(validMoves)
+            BotMove = SmartMoveFinder.findBestMove(gs, validMoves)
+
+            if BotMove is None:
+                BotMove = SmartMoveFinder.findRandomMove(validMoves)
 
             gs.makeMove(BotMove)
 
@@ -200,8 +203,7 @@ def animateMove(move, screen, board, clock):
     dC = move.endCol - move.startCol
 
     animationTime = 0.1  # Total animation time in seconds (constant)
-    framesPerSecond = 60  # Number of frames per second
-    frameCount = int(animationTime * framesPerSecond)  # Total number of frames
+    frameCount = int(animationTime * MAX_FPS)  # Total number of frames
     
     for frame in range(frameCount + 1):
         # Compute the current row and column positions based on the frame
@@ -233,7 +235,7 @@ def animateMove(move, screen, board, clock):
         
         # Update the display and control the frame rate
         p.display.flip()
-        clock.tick(framesPerSecond)
+        clock.tick(MAX_FPS)
 
 def drawText(screen, text):
     # Define font and colors
