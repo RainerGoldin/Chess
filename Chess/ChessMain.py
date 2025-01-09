@@ -1,12 +1,11 @@
 # This is the main driver file. It will be responsible for handling user input and displaying the current GameState object.
 
 import pygame as p
-from time import sleep
 
 try:
-    from Chess import ChessEngine
+    from Chess import ChessEngine, SmartMoveFinder
 except ModuleNotFoundError:
-    import ChessEngine
+    import ChessEngine, SmartMoveFinder
 
 WIDTH = HEIGHT = 512 # 400 is also a good option
 DIMENSION = 8 # The dimension of a chess board is 8x8
@@ -51,16 +50,20 @@ def main():
     sqSelected = () # No square is selected, keep track of the last click of the user (tuple: (row, col))
     playerClicks = [] # Keep track of player clicks (two tuples: [(6, 4), (4, 4)])
     gameOver = False
+    playerOne = True # If a human is playing white, then this will be True. If a bot is playing, then it is going to be False
+    playerTwo = False # Same as above but for black
 
     loadImages() # Only do this once, before the while loop
 
     while running:
+        humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
+
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
             # Mouse handler
             elif e.type == p.MOUSEBUTTONDOWN:
-                if not gameOver:
+                if not gameOver and humanTurn:
                     location = p.mouse.get_pos() # (x, y) location of mouse
                     col = location[0] // SQ_SIZE
                     row = location[1] // SQ_SIZE
@@ -93,6 +96,7 @@ def main():
                     gameOver = False
                     moveMade = True
                     animate = False
+
                 if e.key == p.K_r: # Reset the board when 'r' is pressed
                     gameOver = False
                     gs = ChessEngine.GameState()
@@ -102,9 +106,19 @@ def main():
                     moveMade = False
                     animate = False
 
+        # Bot move finder
+        if not gameOver and not humanTurn:
+            BotMove = SmartMoveFinder.findRandomMove(validMoves)
+
+            gs.makeMove(BotMove)
+
+            moveMade = True
+            animate = True
+
         if moveMade:
             if animate:
                 animateMove(gs.moveLog[-1], screen, gs.board, clock)
+
             validMoves = gs.getValidMoves()
             moveMade = False 
             animate = False        
@@ -121,7 +135,7 @@ def main():
         elif gs.staleMate:
             gameOver = True
 
-            drawText('Stalemate')
+            drawText(screen, 'Stalemate')
 
         clock.tick(MAX_FPS)
         p.display.flip()
