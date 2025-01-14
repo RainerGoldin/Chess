@@ -109,7 +109,6 @@ def main():
         # Bot move finder
         if not gameOver and not humanTurn:
             BotMove = SmartMoveFinder.findBestMove(gs, validMoves)
-
             if BotMove is None:
                 BotMove = SmartMoveFinder.findRandomMove(validMoves)
 
